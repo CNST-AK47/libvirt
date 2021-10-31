@@ -24,16 +24,19 @@
 
 #include "internal.h"
 
-
 /**
  * virBuffer:
  *
  * A buffer structure.
  */
+// 声明一个buffer
 typedef struct _virBuffer virBuffer;
 typedef virBuffer *virBufferPtr;
 
-#define VIR_BUFFER_INITIALIZER { NULL, 0 }
+#define VIR_BUFFER_INITIALIZER \
+  {                            \
+    NULL, 0                    \
+  }
 
 /**
  * VIR_BUFFER_INIT_CHILD:
@@ -42,29 +45,65 @@ typedef virBuffer *virBufferPtr;
  * Initialize a virBuffer structure and set up the indentation level for
  * formatting XML subelements of @parentbuf.
  */
-#define VIR_BUFFER_INIT_CHILD(parentbuf) { NULL, (parentbuf)->indent + 2 }
 
-struct _virBuffer {
-    GString *str;
-    int indent;
+/**
+ * @brief 初始化buffer的字结构体
+ */
+#define VIR_BUFFER_INIT_CHILD(parentbuf) \
+  {                                      \
+    NULL, (parentbuf)->indent + 2        \
+  }
+/**
+ * @brief vir缓冲结构体
+ */
+struct _virBuffer
+{
+  GString *str; //< Gstring 指针
+  int indent;
 };
-
+/**
+ * @brief  获取buf上下文字符串
+ * @param  buf     buf对应数据
+ * @return const char* 返回目标数据指针
+ */
 const char *virBufferCurrentContent(virBufferPtr buf);
+/**
+ * @brief  获取相关数据并重置buf
+ * @param  buf              My Param doc
+ * @return char* 
+ */
 char *virBufferContentAndReset(virBufferPtr buf);
+/**
+ * @brief  释放buf内存，并且将数据所有数据重新设置为1
+ * @param  buf              buf数据指针
+ */
 void virBufferFreeAndReset(virBufferPtr buf);
-
+/**
+ * @brief Construct a new g define auto cleanup clear func object
+ * 使用G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC 定义析构函数
+ */
 G_DEFINE_AUTO_CLEANUP_CLEAR_FUNC(virBuffer, virBufferFreeAndReset);
-
+/**
+ * @brief  查询buffer使用量
+ * @param  buf       
+ * @return size_t 存储数据量
+ */
 size_t virBufferUse(const virBuffer *buf);
+/**
+ * @brief  将str中数据拷贝len到buf中
+ * @param  buf              缓冲数据
+ * @param  str              原始字符串
+ * @param  len              相对长度
+ */
 void virBufferAdd(virBufferPtr buf, const char *str, int len);
 void virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd);
 void virBufferAddChar(virBufferPtr buf, char c);
 void virBufferAsprintf(virBufferPtr buf, const char *format, ...)
-  G_GNUC_PRINTF(2, 3);
+    G_GNUC_PRINTF(2, 3);
 void virBufferVasprintf(virBufferPtr buf, const char *format, va_list ap)
-  G_GNUC_PRINTF(2, 0);
+    G_GNUC_PRINTF(2, 0);
 void virBufferStrcat(virBufferPtr buf, ...)
-  G_GNUC_NULL_TERMINATED;
+    G_GNUC_NULL_TERMINATED;
 void virBufferStrcatVArgs(virBufferPtr buf, va_list ap);
 
 void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
@@ -83,7 +122,7 @@ void virBufferEscapeShell(virBufferPtr buf, const char *str);
 void virBufferURIEncodeString(virBufferPtr buf, const char *str);
 
 #define virBufferAddLit(buf_, literal_string_) \
-    virBufferAdd(buf_, "" literal_string_ "", sizeof(literal_string_) - 1)
+  virBufferAdd(buf_, "" literal_string_ "", sizeof(literal_string_) - 1)
 
 void virBufferAdjustIndent(virBufferPtr buf, int indent);
 void virBufferSetIndent(virBufferPtr, int indent);

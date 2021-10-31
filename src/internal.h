@@ -72,21 +72,48 @@
 
 
 /* String equality tests, suggested by Jim Meyering. */
+/**
+ * @brief 比较字符串是否相同
+ */
 #define STREQ(a, b) (strcmp(a, b) == 0)
+/**
+ * @brief 比较字符串是哦度相同
+ */
 #define STRCASEEQ(a, b) (g_ascii_strcasecmp(a, b) == 0)
+/**
+ * @brief 字符串不相同
+ */
 #define STRNEQ(a, b) (strcmp(a, b) != 0)
 #define STRCASENEQ(a, b) (g_ascii_strcasecmp(a, b) != 0)
+/**
+ * @brief 比较字符串前n个相同
+ */
 #define STREQLEN(a, b, n) (strncmp(a, b, n) == 0)
+
 #define STRCASEEQLEN(a, b, n) (g_ascii_strncasecmp(a, b, n) == 0)
+/**
+ * @brief 字符串前n个不相同
+ */
 #define STRNEQLEN(a, b, n) (strncmp(a, b, n) != 0)
 #define STRCASENEQLEN(a, b, n) (g_ascii_strncasecmp(a, b, n) != 0)
+/**
+ * @brief 是否为前缀
+ */
 #define STRPREFIX(a, b) (strncmp(a, b, strlen(b)) == 0)
+/**
+ * @brief 是否为前缀
+ */
 #define STRCASEPREFIX(a, b) (g_ascii_strncasecmp(a, b, strlen(b)) == 0)
+/**
+ * @brief a是否可以跳过b
+ */
 #define STRSKIP(a, b) (STRPREFIX(a, b) ? (a) + strlen(b) : NULL)
 
 #define STREQ_NULLABLE(a, b) (g_strcmp0(a, b) == 0)
 #define STRNEQ_NULLABLE(a, b) (g_strcmp0(a, b) != 0)
-
+/**
+ * @brief 为字符串添加后缀
+ */
 #define NUL_TERMINATE(buf) do { (buf)[sizeof(buf)-1] = '\0'; } while (0)
 
 #ifdef WIN32
@@ -217,6 +244,8 @@
  *
  * In place exchange of two values
  */
+// 交换两个数
+// 使用位运算来实现两个数的交换
 #define SWAP(a, b) \
     do { \
         (a) = (a) ^ (b); \

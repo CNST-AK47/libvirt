@@ -52,6 +52,7 @@
 
 VIR_LOG_INIT("util.numa");
 
+#define HAVE_NUMAD 0
 
 #if HAVE_NUMAD
 char *

@@ -757,12 +757,19 @@ daemonUsage(const char *argv0, bool privileged)
 }
 
 int main(int argc, char **argv) {
+    // 网络守护进程指针
     virNetDaemonPtr dmn = NULL;
+    // 网络服务器指针
     virNetServerPtr srv = NULL;
+    // 主服务器指针
     virNetServerPtr srvAdm = NULL;
+    // 网络服务处理器admin指针
     virNetServerProgramPtr adminProgram = NULL;
+    // 网络lxc指针
     virNetServerProgramPtr lxcProgram = NULL;
+    // 远端配置文件指针
     char *remote_config_file = NULL;
+    // 状态写入
     int statuswrite = -1;
     int ret = 1;
     int pid_file_fd = -1;

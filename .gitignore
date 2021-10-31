@@ -38,3 +38,4 @@ Makefile.in
 /build/
 /ci/scratch/
 tags
+/doc/

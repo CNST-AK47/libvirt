@@ -17,6 +17,7 @@
  *
  * extract the domain 0 information
  */
+
 static void
 getDomainInfo(const char *uri, const char *name)
 {

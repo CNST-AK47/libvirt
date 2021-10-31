@@ -68,37 +68,42 @@
 #undef g_strdup_printf
 #undef g_strdup_vprintf
 
-
-gchar *
-vir_g_canonicalize_filename(const gchar *filename,
-                            const gchar *relative_to)
+gchar *vir_g_canonicalize_filename(const gchar *filename,
+                                   const gchar *relative_to)
 {
+// 版本大于2.58.0 直接使用内置函数 
 #if GLIB_CHECK_VERSION(2, 58, 0)
     return g_canonicalize_filename(filename, relative_to);
-#else /* ! GLIB_CHECK_VERSION(2, 58, 0) */
+#else  /* ! GLIB_CHECK_VERSION(2, 58, 0) */
     gchar *canon, *start, *p, *q;
     guint i;
 
     g_return_val_if_fail(relative_to == NULL || g_path_is_absolute(relative_to), NULL);
-
-    if (!g_path_is_absolute(filename)) {
+    // 如果路径不是绝对路径
+    // 
+    if (!g_path_is_absolute(filename))
+    {
         gchar *cwd_allocated = NULL;
-        const gchar  *cwd;
+        const gchar *cwd;
 
         if (relative_to != NULL)
             cwd = relative_to;
         else
+            //  获取当前路径
             cwd = cwd_allocated = g_get_current_dir();
-
+        // 进行绝对路径拼接
         canon = g_build_filename(cwd, filename, NULL);
         g_free(cwd_allocated);
-    } else {
+    }
+    else
+    {   // 是绝对路径，直接转到定义
         canon = g_strdup(filename);
     }
-
+    // 跳过root 
     start = (char *)g_path_skip_root(canon);
 
-    if (start == NULL) {
+    if (start == NULL)
+    {
         /* This shouldn't really happen, as g_get_current_dir() should
            return an absolute pathname, but bug 573843 shows this is
            not always happening */
@@ -112,15 +117,17 @@ vir_g_canonicalize_filename(const gchar *filename,
      * is treated as "/".
      */
     i = 0;
+    // 跳过"//",统计//的数目
     for (p = start - 1;
          (p >= canon) &&
-             G_IS_DIR_SEPARATOR(*p);
+         G_IS_DIR_SEPARATOR(*p);
          p--)
         i++;
-    if (i > 2) {
+    if (i > 2)
+    {
         i -= 1;
         start -= i;
-        memmove(start, start+i, strlen(start+i) + 1);
+        memmove(start, start + i, strlen(start + i) + 1);
     }
 
     /* Make sure we're using the canonical dir separator */
@@ -129,11 +136,16 @@ vir_g_canonicalize_filename(const gchar *filename,
         *p++ = G_DIR_SEPARATOR;
 
     p = start;
-    while (*p != 0) {
-        if (p[0] == '.' && (p[1] == 0 || G_IS_DIR_SEPARATOR(p[1]))) {
-            memmove(p, p+1, strlen(p+1)+1);
-        } else if (p[0] == '.' && p[1] == '.' &&
-                   (p[2] == 0 || G_IS_DIR_SEPARATOR(p[2]))) {
+    while (*p != 0)
+    {
+        // 将开头的字符进行删除
+        if (p[0] == '.' && (p[1] == 0 || G_IS_DIR_SEPARATOR(p[1])))
+        {
+            memmove(p, p + 1, strlen(p + 1) + 1);
+        }
+        else if (p[0] == '.' && p[1] == '.' &&
+                 (p[2] == 0 || G_IS_DIR_SEPARATOR(p[2])))
+        {
             q = p + 2;
             /* Skip previous separator */
             p = p - 2;
@@ -143,13 +155,16 @@ vir_g_canonicalize_filename(const gchar *filename,
                 p--;
             if (G_IS_DIR_SEPARATOR(*p))
                 *p++ = G_DIR_SEPARATOR;
-            memmove(p, q, strlen(q)+1);
-        } else {
+            memmove(p, q, strlen(q) + 1);
+        }
+        else
+        {
             /* Skip until next separator */
             while (*p != 0 && !G_IS_DIR_SEPARATOR(*p))
                 p++;
 
-            if (*p != 0) {
+            if (*p != 0)
+            {
                 /* Canonicalize one separator */
                 *p++ = G_DIR_SEPARATOR;
             }
@@ -165,17 +180,17 @@ vir_g_canonicalize_filename(const gchar *filename,
     }
 
     /* Remove trailing slashes */
-    if (p > start && G_IS_DIR_SEPARATOR(*(p-1)))
-        *(p-1) = 0;
+    if (p > start && G_IS_DIR_SEPARATOR(*(p - 1)))
+        *(p - 1) = 0;
 
     return canon;
 #endif /* ! GLIB_CHECK_VERSION(2, 58, 0) */
 }
 
-
 /* Drop when min glib >= 2.63.0 */
-gint
-vir_g_fsync(gint fd)
+// 执行同步数据
+// 主要是进行文件同步
+gint vir_g_fsync(gint fd)
 {
 #ifdef G_OS_WIN32
     return _commit(fd);
@@ -184,23 +199,24 @@ vir_g_fsync(gint fd)
 #endif
 }
 
-
 /* Due to a bug in glib, g_strdup_printf() nor g_strdup_vprintf()
  * abort on OOM.  It's fixed in glib's upstream. Provide our own
  * implementation until the fix gets distributed. */
 char *
 vir_g_strdup_printf(const char *msg, ...)
 {
+    // 参数列表
     va_list args;
     char *ret;
+    // 获取列表长度
     va_start(args, msg);
+    // 输出参数信息
     ret = g_strdup_vprintf(msg, args);
     if (!ret)
         abort();
     va_end(args);
     return ret;
 }
-
 
 char *
 vir_g_strdup_vprintf(const char *msg, va_list args)

@@ -40,19 +40,23 @@
  * embedded in an appended string).  If @indent would cause overflow, the
  * indentation level is truncated.
  */
-void
-virBufferAdjustIndent(virBufferPtr buf, int indent)
+void virBufferAdjustIndent(virBufferPtr buf, int indent)
 {
     if (!buf)
         return;
 
-    if (indent > 0) {
-        if (INT_MAX - indent < buf->indent) {
+    if (indent > 0)
+    {
+        if (INT_MAX - indent < buf->indent)
+        {
             buf->indent = INT_MAX;
             return;
         }
-    } else {
-        if (buf->indent < -indent) {
+    }
+    else
+    {
+        if (buf->indent < -indent)
+        {
             buf->indent = 0;
             return;
         }
@@ -60,7 +64,6 @@ virBufferAdjustIndent(virBufferPtr buf, int indent)
 
     buf->indent += indent;
 }
-
 
 /**
  * virBufferSetIndent:
@@ -70,15 +73,13 @@ virBufferAdjustIndent(virBufferPtr buf, int indent)
  * Set the auto-indent value to @indent. See virBufferAdjustIndent on how auto
  * indentation is applied.
  */
-void
-virBufferSetIndent(virBufferPtr buf, int indent)
+void virBufferSetIndent(virBufferPtr buf, int indent)
 {
     if (!buf)
         return;
 
     buf->indent = indent;
 }
-
 
 /**
  * virBufferGetIndent:
@@ -92,7 +93,6 @@ virBufferGetIndent(const virBuffer *buf)
     return buf->indent;
 }
 
-
 /**
  * virBufferGetEffectiveIndent:
  * @buf: the buffer
@@ -103,12 +103,12 @@ virBufferGetIndent(const virBuffer *buf)
 size_t
 virBufferGetEffectiveIndent(const virBuffer *buf)
 {
+    // 如果没有找到换行符返回0，表示这个buf中没有多余的空格
     if (buf->str && buf->str->len && buf->str->str[buf->str->len - 1] != '\n')
         return 0;
-
+    // 找到换行符就返回空格数目
     return buf->indent;
 }
-
 
 /**
  * virBufferInitialize
@@ -122,26 +122,32 @@ virBufferInitialize(virBufferPtr buf)
     if (!buf->str)
         buf->str = g_string_new(NULL);
 }
-
-
-static void
-virBufferApplyIndent(virBufferPtr buf)
+/**
+ * @brief  给字符串添加指定长度的空格
+ * 空格长度为 buf->indent
+ * @param  buf              字符串
+ */
+static void virBufferApplyIndent(virBufferPtr buf)
 {
+    // 长度为58的空格
     const char space[] = "                               ";
     size_t spacesz = sizeof(space) - 1;
+    // 查询buf中的空格数目
     size_t toindent = virBufferGetEffectiveIndent(buf);
-
+    // 如果没有空格直接返回
     if (toindent == 0)
         return;
-
-    while (toindent > spacesz) {
+    // 如果空格大于指定数目58
+    while (toindent > spacesz)
+    {
+        // 将数据添加到空格后面
         g_string_append_len(buf->str, space, spacesz);
+        // 将需要的空格数目进行消减
         toindent -= spacesz;
     }
-
+    // 继续进行下一个
     g_string_append_len(buf->str, space, toindent);
 }
-
 
 /**
  * virBufferAdd:
@@ -153,18 +159,19 @@ virBufferApplyIndent(virBufferPtr buf)
  * str is recomputed to the full string.  Auto indentation may be applied.
  *
  */
-void
-virBufferAdd(virBufferPtr buf, const char *str, int len)
+void virBufferAdd(virBufferPtr buf, const char *str, int len)
 {
     if (!str || !buf || (len == 0 && buf->indent == 0))
         return;
-
+    // 初始化buf
     virBufferInitialize(buf);
+    // 对buf进行扩充
     virBufferApplyIndent(buf);
-
+    // 如果是-1全量添加
     if (len < 0)
         g_string_append(buf->str, str);
     else
+    // 添加部分指定长度
         g_string_append_len(buf->str, str, len);
 }
 
@@ -179,8 +186,7 @@ virBufferAdd(virBufferPtr buf, const char *str, int len)
  *
  * The @toadd virBuffer is consumed and cleared.
  */
-void
-virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd)
+void virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd)
 {
     if (!toadd || !toadd->str)
         return;
@@ -191,7 +197,7 @@ virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd)
     virBufferInitialize(buf);
     g_string_append_len(buf->str, toadd->str->str, toadd->str->len);
 
- cleanup:
+cleanup:
     virBufferFreeAndReset(toadd);
 }
 
@@ -203,8 +209,7 @@ virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd)
  * Add a single character 'c' to a buffer.  Auto indentation may be applied.
  *
  */
-void
-virBufferAddChar(virBufferPtr buf, char c)
+void virBufferAddChar(virBufferPtr buf, char c)
 {
     virBufferAdd(buf, &c, 1);
 }
@@ -222,9 +227,10 @@ virBufferAddChar(virBufferPtr buf, char c)
 const char *
 virBufferCurrentContent(virBufferPtr buf)
 {
+    // buf为空指针直接返回
     if (!buf)
         return NULL;
-
+    // 检查长度是否为1
     if (!buf->str ||
         buf->str->len == 0)
         return "";
@@ -299,8 +305,7 @@ virBufferUse(const virBuffer *buf)
  *
  * Do a formatted print to an XML buffer.  Auto indentation may be applied.
  */
-void
-virBufferAsprintf(virBufferPtr buf, const char *format, ...)
+void virBufferAsprintf(virBufferPtr buf, const char *format, ...)
 {
     va_list argptr;
     va_start(argptr, format);
@@ -316,8 +321,7 @@ virBufferAsprintf(virBufferPtr buf, const char *format, ...)
  *
  * Do a formatted print to an XML buffer.  Auto indentation may be applied.
  */
-void
-virBufferVasprintf(virBufferPtr buf, const char *format, va_list argptr)
+void virBufferVasprintf(virBufferPtr buf, const char *format, va_list argptr)
 {
     if ((format == NULL) || (buf == NULL))
         return;
@@ -327,7 +331,6 @@ virBufferVasprintf(virBufferPtr buf, const char *format, va_list argptr)
 
     g_string_append_vprintf(buf->str, format, argptr);
 }
-
 
 /**
  * virBufferEscapeString:
@@ -340,26 +343,25 @@ virBufferVasprintf(virBufferPtr buf, const char *format, va_list argptr)
  * added (not even the rest of @format).  Auto indentation may be
  * applied.
  */
-void
-virBufferEscapeString(virBufferPtr buf, const char *format, const char *str)
+void virBufferEscapeString(virBufferPtr buf, const char *format, const char *str)
 {
     int len;
     g_autofree char *escaped = NULL;
     char *out;
     const char *cur;
     const char forbidden_characters[] = {
-        0x01,   0x02,   0x03,   0x04,   0x05,   0x06,   0x07,   0x08,
-        /*\t*/  /*\n*/  0x0B,   0x0C,   /*\r*/  0x0E,   0x0F,   0x10,
-        0x11,   0x12,   0x13,   0x14,   0x15,   0x16,   0x17,   0x18,
-        0x19,   '"',    '&',    '\'',   '<',    '>',
-        '\0'
-    };
+        0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+        /*\t*/ /*\n*/ 0x0B, 0x0C, /*\r*/ 0x0E, 0x0F, 0x10,
+        0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18,
+        0x19, '"', '&', '\'', '<', '>',
+        '\0'};
 
     if ((format == NULL) || (buf == NULL) || (str == NULL))
         return;
 
     len = strlen(str);
-    if (strcspn(str, forbidden_characters) == len) {
+    if (strcspn(str, forbidden_characters) == len)
+    {
         virBufferAsprintf(buf, format, str);
         return;
     }
@@ -368,38 +370,50 @@ virBufferEscapeString(virBufferPtr buf, const char *format, const char *str)
 
     cur = str;
     out = escaped;
-    while (*cur != 0) {
-        if (*cur == '<') {
+    while (*cur != 0)
+    {
+        if (*cur == '<')
+        {
             *out++ = '&';
             *out++ = 'l';
             *out++ = 't';
             *out++ = ';';
-        } else if (*cur == '>') {
+        }
+        else if (*cur == '>')
+        {
             *out++ = '&';
             *out++ = 'g';
             *out++ = 't';
             *out++ = ';';
-        } else if (*cur == '&') {
+        }
+        else if (*cur == '&')
+        {
             *out++ = '&';
             *out++ = 'a';
             *out++ = 'm';
             *out++ = 'p';
             *out++ = ';';
-        } else if (*cur == '"') {
+        }
+        else if (*cur == '"')
+        {
             *out++ = '&';
             *out++ = 'q';
             *out++ = 'u';
             *out++ = 'o';
             *out++ = 't';
             *out++ = ';';
-        } else if (*cur == '\'') {
+        }
+        else if (*cur == '\'')
+        {
             *out++ = '&';
             *out++ = 'a';
             *out++ = 'p';
             *out++ = 'o';
             *out++ = 's';
             *out++ = ';';
-        } else if (!strchr(forbidden_characters, *cur)) {
+        }
+        else if (!strchr(forbidden_characters, *cur))
+        {
             /*
              * default case, just copy !
              * Note that character over 0x80 are likely to give problem
@@ -407,7 +421,9 @@ virBufferEscapeString(virBufferPtr buf, const char *format, const char *str)
              * it's hard to handle properly we have to assume it's UTF-8 too
              */
             *out++ = *cur;
-        } else {
+        }
+        else
+        {
             /* silently ignore control characters */
         }
         cur++;
@@ -428,10 +444,9 @@ virBufferEscapeString(virBufferPtr buf, const char *format, const char *str)
  * on. This doesn't fully escape the sexpr, just enough for our code
  * to work.  Auto indentation may be applied.
  */
-void
-virBufferEscapeSexpr(virBufferPtr buf,
-                     const char *format,
-                     const char *str)
+void virBufferEscapeSexpr(virBufferPtr buf,
+                          const char *format,
+                          const char *str)
 {
     virBufferEscape(buf, '\\', "\\'", format, str);
 }
@@ -447,14 +462,12 @@ virBufferEscapeSexpr(virBufferPtr buf,
  * Escaping is not applied to characters specified in @format. Auto
  * indentation may be applied.
  */
-void
-virBufferEscapeRegex(virBufferPtr buf,
-                     const char *format,
-                     const char *str)
+void virBufferEscapeRegex(virBufferPtr buf,
+                          const char *format,
+                          const char *str)
 {
     virBufferEscape(buf, '\\', "^$.|?*+()[]{}\\", format, str);
 }
-
 
 /**
  * virBufferEscapeSQL:
@@ -466,14 +479,12 @@ virBufferEscapeRegex(virBufferPtr buf,
  * escaped to prevent SQL injection (format is expected to contain \"%s\").
  * Auto indentation may be applied.
  */
-void
-virBufferEscapeSQL(virBufferPtr buf,
-                   const char *format,
-                   const char *str)
+void virBufferEscapeSQL(virBufferPtr buf,
+                        const char *format,
+                        const char *str)
 {
     virBufferEscape(buf, '\\', "'\"\\", format, str);
 }
-
 
 /**
  * virBufferEscape:
@@ -488,9 +499,8 @@ virBufferEscapeSQL(virBufferPtr buf,
  * given escape.  Escaping is not applied to characters specified in @format.
  * Auto indentation may be applied.
  */
-void
-virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
-                const char *format, const char *str)
+void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
+                     const char *format, const char *str)
 {
     int len;
     g_autofree char *escaped = NULL;
@@ -501,7 +511,8 @@ virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
         return;
 
     len = strlen(str);
-    if (strcspn(str, toescape) == len) {
+    if (strcspn(str, toescape) == len)
+    {
         virBufferAsprintf(buf, format, str);
         return;
     }
@@ -510,7 +521,8 @@ virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
 
     cur = str;
     out = escaped;
-    while (*cur != 0) {
+    while (*cur != 0)
+    {
         if (strchr(toescape, *cur))
             *out++ = escape;
         *out++ = *cur;
@@ -521,7 +533,6 @@ virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
     virBufferAsprintf(buf, format, escaped);
 }
 
-
 /**
  * virBufferURIEncodeString:
  * @buf: the buffer to append to
@@ -531,8 +542,7 @@ virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
  * during the append (ie any non alpha-numeric characters are replaced
  * with '%xx' hex sequences).  Auto indentation may be applied.
  */
-void
-virBufferURIEncodeString(virBufferPtr buf, const char *str)
+void virBufferURIEncodeString(virBufferPtr buf, const char *str)
 {
     if ((buf == NULL) || (str == NULL))
         return;
@@ -551,8 +561,7 @@ virBufferURIEncodeString(virBufferPtr buf, const char *str)
  * Quotes a string so that the shell (/bin/sh) will interpret the
  * quoted string to mean str.  Auto indentation may be applied.
  */
-void
-virBufferEscapeShell(virBufferPtr buf, const char *str)
+void virBufferEscapeShell(virBufferPtr buf, const char *str)
 {
     int len;
     g_autofree char *escaped = NULL;
@@ -563,16 +572,20 @@ virBufferEscapeShell(virBufferPtr buf, const char *str)
         return;
 
     /* Only quote if str includes shell metacharacters. */
-    if (*str && !strpbrk(str, "\r\t\n !\"#$&'()*;<>?[\\]^`{|}~")) {
+    if (*str && !strpbrk(str, "\r\t\n !\"#$&'()*;<>?[\\]^`{|}~"))
+    {
         virBufferAdd(buf, str, -1);
         return;
     }
 
-    if (*str) {
+    if (*str)
+    {
         len = strlen(str);
 
         escaped = g_malloc0_n(len + 1, 4);
-    } else {
+    }
+    else
+    {
         virBufferAddLit(buf, "''");
         return;
     }
@@ -581,8 +594,10 @@ virBufferEscapeShell(virBufferPtr buf, const char *str)
     out = escaped;
 
     *out++ = '\'';
-    while (*cur != 0) {
-        if (*cur == '\'') {
+    while (*cur != 0)
+    {
+        if (*cur == '\'')
+        {
             *out++ = '\'';
             /* Replace literal ' with a close ', a \', and a open ' */
             *out++ = '\\';
@@ -603,9 +618,8 @@ virBufferEscapeShell(virBufferPtr buf, const char *str)
  *
  * See virBufferStrcat.
  */
-void
-virBufferStrcatVArgs(virBufferPtr buf,
-                     va_list ap)
+void virBufferStrcatVArgs(virBufferPtr buf,
+                          va_list ap)
 {
     char *str;
 
@@ -621,8 +635,7 @@ virBufferStrcatVArgs(virBufferPtr buf,
  * Concatenate strings to an XML buffer.  Auto indentation may be applied
  * after each string argument.
  */
-void
-virBufferStrcat(virBufferPtr buf, ...)
+void virBufferStrcat(virBufferPtr buf, ...)
 {
     va_list ap;
 
@@ -641,8 +654,7 @@ virBufferStrcat(virBufferPtr buf, ...)
  *
  * Trim the supplied string from the tail of the buffer.
  */
-void
-virBufferTrim(virBufferPtr buf, const char *str)
+void virBufferTrim(virBufferPtr buf, const char *str)
 {
     size_t len = 0;
 
@@ -669,8 +681,7 @@ virBufferTrim(virBufferPtr buf, const char *str)
  * Trim the tail of the buffer. The longest string that can be formed with
  * the characters from @trim is trimmed.
  */
-void
-virBufferTrimChars(virBufferPtr buf, const char *trim)
+void virBufferTrimChars(virBufferPtr buf, const char *trim)
 {
     ssize_t i;
 
@@ -680,7 +691,8 @@ virBufferTrimChars(virBufferPtr buf, const char *trim)
     if (!trim)
         return;
 
-    for (i = buf->str->len - 1; i > 0; i--) {
+    for (i = buf->str->len - 1; i > 0; i--)
+    {
         if (!strchr(trim, buf->str->str[i]))
             break;
     }
@@ -695,8 +707,7 @@ virBufferTrimChars(virBufferPtr buf, const char *trim)
  *
  * Trim the tail of a buffer.
  */
-void
-virBufferTrimLen(virBufferPtr buf, int len)
+void virBufferTrimLen(virBufferPtr buf, int len)
 {
     if (!buf || !buf->str)
         return;
@@ -715,20 +726,23 @@ virBufferTrimLen(virBufferPtr buf, int len)
  * Appends @str to @buffer. Applies autoindentation on the separate lines of
  * @str.
  */
-void
-virBufferAddStr(virBufferPtr buf,
-                const char *str)
+void virBufferAddStr(virBufferPtr buf,
+                     const char *str)
 {
     const char *end;
 
     if (!buf || !str)
         return;
 
-    while (*str) {
-        if ((end = strchr(str, '\n'))) {
+    while (*str)
+    {
+        if ((end = strchr(str, '\n')))
+        {
             virBufferAdd(buf, str, (end - str) + 1);
             str = end + 1;
-        } else {
+        }
+        else
+        {
             virBufferAdd(buf, str, -1);
             break;
         }

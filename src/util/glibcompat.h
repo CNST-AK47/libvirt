@@ -17,12 +17,48 @@
  */
 
 #pragma once
-
+/**
+ * @file glibcompat.h
+ * @brief  glibcompat 相关函数封装文件
+ * @details 
+ * @author wangpengcheng  (wangpengcheng2018@gmail.com)
+ * @version 1.0
+ * @date 2021-10-20 00:51:43
+ * @copyright Copyright (c) 2021  IRLSCU
+ * 
+ * @par 修改日志:
+ * <table>
+ * <tr>
+ *    <th> Commit date</th>
+ *    <th> Version </th> 
+ *    <th> Author </th>  
+ *    <th> Description </th>
+ * </tr>
+ * <tr>
+ *    <td> 2021-10-20 00:51:43 </td>
+ *    <td> 1.0 </td>
+ *    <td> wangpengcheng </td>
+ *    <td>内容</td>
+ * </tr>
+ * </table>
+ */
 #include <glib.h>
 #include <glib/gstdio.h>
 
+/**
+ * @brief  获取完整的文件路径
+ * @param  filename         文件名称
+ * @param  relative_to      文件相对路径
+ * @return gchar*  文件对应的绝对路径
+ */
 gchar * vir_g_canonicalize_filename(const gchar *filename,
                                     const gchar *relative_to);
+
+/**
+ * @brief  vir文件同步
+ * @param  fd         文件句柄编号
+ * @return gint         
+ */
 gint vir_g_fsync(gint fd);
 char *vir_g_strdup_printf(const char *msg, ...)
     G_GNUC_PRINTF(1, 2);
