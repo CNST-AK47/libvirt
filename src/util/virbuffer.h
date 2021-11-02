@@ -96,14 +96,45 @@ size_t virBufferUse(const virBuffer *buf);
  * @param  len              相对长度
  */
 void virBufferAdd(virBufferPtr buf, const char *str, int len);
+/**
+ * @brief  将目标toadd 添加到目标buf上
+ * @param  buf              目标buf
+ * @param  toadd            需要额外添加的buf
+ */
 void virBufferAddBuffer(virBufferPtr buf, virBufferPtr toadd);
+/**
+ * @brief  增加到字符串上
+ * @param  buf              buf
+ * @param  c                目标字符串
+ */
 void virBufferAddChar(virBufferPtr buf, char c);
+
+/**
+ * @brief 将buf 按照指定格式进行输出
+ * @param buf buf
+ * @param format 指定格式
+ */
 void virBufferAsprintf(virBufferPtr buf, const char *format, ...)
-    G_GNUC_PRINTF(2, 3);
+    G_GNUC_PRINTF(2, 3); // 注意这里的统一参数参数检查，检查第二合第一个参数
+/**
+ * @brief 按照指定格式进行输出
+ */
 void virBufferVasprintf(virBufferPtr buf, const char *format, va_list ap)
     G_GNUC_PRINTF(2, 0);
+/**
+ * @brief  将参数添加到buf中，对于xml会进行自动格式化
+ * @note 最后一个参数为NULL
+ * @param  buf              缓冲buf
+ * @param  ...              对应的格式参数
+ */
 void virBufferStrcat(virBufferPtr buf, ...)
     G_GNUC_NULL_TERMINATED;
+
+/**
+ * @brief  将参数添加到buf中
+ * @param  buf              My Param doc
+ * @param  ap               My Param doc
+ */
 void virBufferStrcatVArgs(virBufferPtr buf, va_list ap);
 
 void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,

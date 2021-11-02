@@ -130,7 +130,7 @@ virBufferInitialize(virBufferPtr buf)
 static void virBufferApplyIndent(virBufferPtr buf)
 {
     // 长度为58的空格
-    const char space[] = "                               ";
+    const char space[] = "          ·                     ";
     size_t spacesz = sizeof(space) - 1;
     // 查询buf中的空格数目
     size_t toindent = virBufferGetEffectiveIndent(buf);
@@ -307,9 +307,14 @@ virBufferUse(const virBuffer *buf)
  */
 void virBufferAsprintf(virBufferPtr buf, const char *format, ...)
 {
+    // 获取数据
+    // @see https://blog.csdn.net/dengzhilong_cpp/article/details/54944676
     va_list argptr;
+    // 将第一个变量的地址给argptr
     va_start(argptr, format);
+    // 将参数啊找指定格式进行输出
     virBufferVasprintf(buf, format, argptr);
+    // 清空指针
     va_end(argptr);
 }
 
@@ -328,7 +333,7 @@ void virBufferVasprintf(virBufferPtr buf, const char *format, va_list argptr)
 
     virBufferInitialize(buf);
     virBufferApplyIndent(buf);
-
+    // 将fmt转化为buf
     g_string_append_vprintf(buf->str, format, argptr);
 }
 
@@ -622,7 +627,7 @@ void virBufferStrcatVArgs(virBufferPtr buf,
                           va_list ap)
 {
     char *str;
-
+    // 获取参数内容，将内容添加到buf中
     while ((str = va_arg(ap, char *)) != NULL)
         virBufferAdd(buf, str, -1);
 }
@@ -641,9 +646,11 @@ void virBufferStrcat(virBufferPtr buf, ...)
 
     if (!buf)
         return;
-
+    // 将buf位置指向ap
     va_start(ap, buf);
+
     virBufferStrcatVArgs(buf, ap);
+    // 清空指针
     va_end(ap);
 }
 

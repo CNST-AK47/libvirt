@@ -5,8 +5,10 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 //"${workspaceFolder}/include/libvirt",
-                "/usr/include",
-                "/usr/include/**"
+                "/usr/local/include/",
+                // "/usr/include/",
+                // "/usr/include/**",
+                "/usr/local/Cellar/glib/2.70.0_1/include/glib-2.0/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

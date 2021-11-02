@@ -111,6 +111,12 @@
         "datatypes.h": "c",
         "virobject.h": "c",
         "viruuid.h": "c",
-        "virbuffer.h": "c"
+        "virbuffer.h": "c",
+        "glib.h": "c",
+        "gbitlock.h": "c",
+        "gbookmarkfile.h": "c",
+        "gbytes.h": "c",
+        "gstdio.h": "c",
+        "galloca.h": "c"
     }
 }
