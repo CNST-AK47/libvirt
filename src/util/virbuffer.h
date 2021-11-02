@@ -136,7 +136,14 @@ void virBufferStrcat(virBufferPtr buf, ...)
  * @param  ap               My Param doc
  */
 void virBufferStrcatVArgs(virBufferPtr buf, va_list ap);
-
+/**
+ * @brief  
+ * @param  buf              My Param doc
+ * @param  escape           My Param doc
+ * @param  toescape         My Param doc
+ * @param  format           My Param doc
+ * @param  str              My Param doc
+ */
 void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
                      const char *format, const char *str);
 void virBufferEscapeString(virBufferPtr buf, const char *format,
