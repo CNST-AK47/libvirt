@@ -504,8 +504,13 @@ void virBufferEscapeSQL(virBufferPtr buf,
  * given escape.  Escaping is not applied to characters specified in @format.
  * Auto indentation may be applied.
  */
-void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
-                     const char *format, const char *str)
+void virBufferEscape(
+    virBufferPtr buf, 
+    char escape, 
+    const char *toescape,
+    const char *format, 
+    const char *str
+    )
 {
     int len;
     g_autofree char *escaped = NULL;
@@ -514,27 +519,36 @@ void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
 
     if ((format == NULL) || (buf == NULL) || (str == NULL))
         return;
-
+    // 获取字符串长度
     len = strlen(str);
+    // 没有重复直接在按照格式进行输出添加
     if (strcspn(str, toescape) == len)
     {
+        // 按照格式进行输出
         virBufferAsprintf(buf, format, str);
         return;
     }
-
+    // 为str多分配两个字节
     escaped = g_malloc0_n(len + 1, 2);
-
+    // 原始字符串开始指针
     cur = str;
+    // 结果开始指针
     out = escaped;
+    // 遍历原始字符串
     while (*cur != 0)
     {
+        // 是否与替换目标实现了匹配，一开始的空字符肯定不会有匹配
+        // 查找到了目标字符串
         if (strchr(toescape, *cur))
+            // 使用escap进行替换
             *out++ = escape;
+        // 进行字符串复制
         *out++ = *cur;
         cur++;
     }
+    // 重新设置指针
     *out = 0;
-
+    // 正常进行输出
     virBufferAsprintf(buf, format, escaped);
 }
 
@@ -554,7 +568,7 @@ void virBufferURIEncodeString(virBufferPtr buf, const char *str)
 
     virBufferInitialize(buf);
     virBufferApplyIndent(buf);
-
+    // 对应的相关转义
     g_string_append_uri_escaped(buf->str, str, NULL, false);
 }
 
@@ -672,11 +686,11 @@ void virBufferTrim(virBufferPtr buf, const char *str)
         return;
 
     len = strlen(str);
-
+    // 大于原始字符串长度，末尾无匹配项目直接返回
     if (len > buf->str->len ||
         memcmp(&buf->str->str[buf->str->len - len], str, len) != 0)
         return;
-
+    // 进行减少操作
     g_string_truncate(buf->str, buf->str->len - len);
 }
 

@@ -137,17 +137,30 @@ void virBufferStrcat(virBufferPtr buf, ...)
  */
 void virBufferStrcatVArgs(virBufferPtr buf, va_list ap);
 /**
- * @brief  
- * @param  buf              My Param doc
- * @param  escape           My Param doc
- * @param  toescape         My Param doc
- * @param  format           My Param doc
- * @param  str              My Param doc
+ * @brief  使用buf将字符串进行替换
+ * @param  buf              
+ * @param  escape           替换字符串
+ * @param  toescape         被替换字符串
+ * @param  format           格式
+ * @param  str              原始字符串
  */
 void virBufferEscape(virBufferPtr buf, char escape, const char *toescape,
                      const char *format, const char *str);
+
+/**
+ * @brief  对string 进行标准字符串的替换，主要是针对特殊的符号进行转意
+ * @param  buf              目标缓冲区
+ * @param  format           指定格式
+ * @param  str              原始字符串
+ */
 void virBufferEscapeString(virBufferPtr buf, const char *format,
                            const char *str);
+/**
+ * @brief  正则表达式转义
+ * @param  buf              My Param doc
+ * @param  format           My Param doc
+ * @param  str              My Param doc
+ */
 void virBufferEscapeSexpr(virBufferPtr buf, const char *format,
                           const char *str);
 void virBufferEscapeRegex(virBufferPtr buf,
@@ -157,18 +170,55 @@ void virBufferEscapeSQL(virBufferPtr buf,
                         const char *format,
                         const char *str);
 void virBufferEscapeShell(virBufferPtr buf, const char *str);
+
 void virBufferURIEncodeString(virBufferPtr buf, const char *str);
 
 #define virBufferAddLit(buf_, literal_string_) \
   virBufferAdd(buf_, "" literal_string_ "", sizeof(literal_string_) - 1)
-
+/**
+ * @brief  调整缩进
+ * @param  buf              目标缓冲区
+ * @param  indent           需要增加或者减少的缩进字符
+ */
 void virBufferAdjustIndent(virBufferPtr buf, int indent);
+/**
+ * @brief  设置锁进
+ * @param  indent           My Param doc
+ */
 void virBufferSetIndent(virBufferPtr, int indent);
-
+/**
+ * @brief 获取当前缩紧
+ * @param  buf              缓冲区
+ * @return size_t           需要缩进大小
+ */
 size_t virBufferGetIndent(const virBuffer *buf);
+/**
+ * @brief  获取格式化需要的缩进大小
+ * @param  buf              目标字符串
+ * @return size_t 
+ */
 size_t virBufferGetEffectiveIndent(const virBuffer *buf);
-
+/**
+ * @brief  去除buf末尾字符串
+ * @param  buf              buf
+ * @param  trim             目标字符串
+ */
 void virBufferTrim(virBufferPtr buf, const char *trim);
+/**
+ * @brief  去除末尾字符数组
+ * @param  buf              buf
+ * @param  trim             目标字符串
+ */
 void virBufferTrimChars(virBufferPtr buf, const char *trim);
+/**
+ * @brief  去除末尾指定长度
+ * @param  buf              缓冲区
+ * @param  len              指定长度
+ */
 void virBufferTrimLen(virBufferPtr buf, int len);
+/**
+ * @brief  将str添加到buf中
+ * @param  buf              缓冲区buf
+ * @param  str              目标字符串
+ */
 void virBufferAddStr(virBufferPtr buf, const char *str);
